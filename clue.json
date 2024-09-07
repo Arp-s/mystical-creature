@@ -1,0 +1,12 @@
+{
+  "1": {
+    "indice1": "Indice 1 du groupe 1",
+    "indice2": "Indice 2 du groupe 1",
+    "indice3": "Indice 3 du groupe 1"
+  },
+  "2": {
+    "indice1": "Indice 1 du groupe 2",
+    "indice2": "Indice 2 du groupe 2",
+    "indice3": "Indice 3 du groupe 2"
+  }
+}
