@@ -1,12 +1,13 @@
 {
-  "name": "backend",
+  "name": "mon-projet",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "Backend pour le projet de jeu",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node backend/server.js"
   },
   "dependencies": {
-    "express": "^4.17.3",
-    "ws": "^8.8.1"
+    "express": "^4.17.1",
+    "ws": "^8.0.0"
   }
 }
