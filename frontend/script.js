@@ -30,7 +30,7 @@ joinBtn?.addEventListener('click', () => {
 
 // Gérer la connexion WebSocket et l'affichage des joueurs
 function connectWebSocket(code) {
-    socket = new WebSocket(`wss://ton-backend.onrender.com/?code=${code}`);
+    socket = new WebSocket(`wss://mystical-creature.onrender.com/?code=${code}`);
 
     socket.onopen = () => {
         console.log('Connected to WebSocket');
