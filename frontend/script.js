@@ -35,17 +35,17 @@ function connectWebSocket(code) {
     socket.onopen = () => {
         console.log('Connected to WebSocket');
     };
-
+    
     socket.onmessage = (event) => {
         let data;
         try {
             data = JSON.parse(event.data);
         } catch (e) {
-            data = event.data; // Si le message n'est pas JSON, il reste tel quel
+            data = event.data;
         }
         
         if (data.playerCount !== undefined) {
-            playerCount.textContent = data.playerCount;
+            playerCount.textContent = data.playerCount; // Mettre à jour le nombre de joueurs
         }
         
         if (data.clue !== undefined) {
