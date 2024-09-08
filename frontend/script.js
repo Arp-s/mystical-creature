@@ -41,7 +41,7 @@ function connectWebSocket(code) {
         try {
             data = JSON.parse(event.data);
         } catch (e) {
-            data = event.data;
+            data = event.data; // Si le message n'est pas JSON, il reste tel quel
         }
         
         if (data.playerCount !== undefined) {
