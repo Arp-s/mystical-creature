@@ -9,18 +9,15 @@ const playerCount = document.getElementById('playerCount');
 let socket;
 let gameCode;
 
-// Générer un code de 5 lettres
 function generateCode() {
     return Math.random().toString(36).substr(2, 5).toUpperCase();
 }
 
-// Lancer une nouvelle partie
 startBtn?.addEventListener('click', () => {
     gameCode = generateCode();
     window.location.href = `waiting.html?code=${gameCode}`;
 });
 
-// Rejoindre une partie existante
 joinBtn?.addEventListener('click', () => {
     const code = codeInput.value.trim().toUpperCase();
     if (code) {
@@ -28,28 +25,31 @@ joinBtn?.addEventListener('click', () => {
     }
 });
 
-// Gérer la connexion WebSocket et l'affichage des joueurs
 function connectWebSocket(code) {
     socket = new WebSocket(`wss://mystical-creature.onrender.com/?code=${code}`);
 
     socket.onopen = () => {
         console.log('Connected to WebSocket');
     };
-    
+
     socket.onmessage = (event) => {
         let data;
         try {
             data = JSON.parse(event.data);
         } catch (e) {
-            data = event.data; // Si le message n'est pas JSON, il reste tel quel
+            data = event.data;
         }
-        
+
         if (data.playerCount !== undefined) {
-            playerCount.textContent = data.playerCount; // Mettre à jour le nombre de joueurs
+            playerCount.textContent = data.playerCount;
         }
-        
+
         if (data.clue !== undefined) {
-            clueDisplay.textContent = data.clue; // Affiche l'indice reçu
+            clueDisplay.textContent = data.clue;
+        }
+
+        if (data.type === 'gameStarted') {
+            window.location.href = `game.html?code=${code}`;
         }
     };
 
@@ -62,14 +62,16 @@ function connectWebSocket(code) {
     };
 }
 
-// Lancer le jeu après attente
 launchBtn?.addEventListener('click', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    window.location.href = `game.html?code=${code}`;
+    if (code) {
+        socket.send(JSON.stringify({ type: 'startGame' }));
+    } else {
+        console.error('No game code provided');
+    }
 });
 
-// Connexion au WebSocket sur la page d'attente
 if (window.location.pathname.includes('waiting.html')) {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
@@ -80,7 +82,6 @@ if (window.location.pathname.includes('waiting.html')) {
     }
 }
 
-// Révéler un indice sur la page de jeu
 revealBtn?.addEventListener('click', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
