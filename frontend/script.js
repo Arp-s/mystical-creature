@@ -13,28 +13,6 @@ function generateCode() {
     return Math.random().toString(36).substr(2, 5).toUpperCase();
 }
 
-startBtn?.addEventListener('click', () => {
-    gameCode = generateCode();
-    window.location.href = `waiting.html?code=${gameCode}`;
-});
-
-joinBtn?.addEventListener('click', () => {
-    const code = codeInput.value.trim().toUpperCase();
-    if (code) {
-        window.location.href = `waiting.html?code=${code}`;
-    }
-});
-
-launchBtn?.addEventListener('click', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    if (code) {
-        socket.send(JSON.stringify({ type: 'startGame' }));
-    } else {
-        console.error('No game code provided');
-    }
-});
-
 function connectWebSocket(code) {
     socket = new WebSocket(`wss://mystical-creature.onrender.com/?code=${code}`);
 
@@ -81,6 +59,24 @@ if (window.location.pathname.includes('waiting.html')) {
         console.error('No game code provided');
     }
 }
+
+joinBtn?.addEventListener('click', () => {
+    const code = codeInput.value.trim().toUpperCase();
+    if (code) {
+        window.location.href = `waiting.html?code=${code}`;
+    }
+});
+
+launchBtn?.addEventListener('click', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+        socket.send(JSON.stringify({ type: 'startGame' }));
+    } else {
+        console.error('No game code provided');
+    }
+});
+
 
 revealBtn?.addEventListener('click', () => {
     const urlParams = new URLSearchParams(window.location.search);
