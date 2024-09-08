@@ -1,13 +1,9 @@
-const express = require('express'); // Assure-toi d'avoir importé express
-const http = require('http');
-const WebSocket = require('ws');
-const clues = require('./clues.json');
-
-const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
-let games = {};
+function broadcastPlayerCount(gameCode) {
+    const playerCount = games[gameCode].players.length;
+    games[gameCode].players.forEach(player => {
+        player.send(JSON.stringify({ playerCount }));
+    });
+}
 
 wss.on('connection', (ws, req) => {
     const params = new URLSearchParams(req.url.slice(1)); // Extraire les paramètres de l'URL
@@ -25,6 +21,9 @@ wss.on('connection', (ws, req) => {
 
     const playerNumber = games[gameCode].players.length + 1;
     games[gameCode].players.push(ws);
+
+    // Envoyer le message de mise à jour du joueur à tous les joueurs
+    broadcastPlayerCount(gameCode);
 
     ws.send(JSON.stringify({ message: 'Player joined', playerNumber: playerNumber }));
 
@@ -44,20 +43,16 @@ wss.on('connection', (ws, req) => {
     }
 
     ws.on('message', (message) => {
-        // Ici tu peux gérer les messages reçus des joueurs
         console.log(`Received message: ${message}`);
     });
 
     ws.on('close', () => {
-        // Retirer le joueur de la partie en cas de déconnexion
         games[gameCode].players = games[gameCode].players.filter(player => player !== ws);
         if (games[gameCode].players.length === 0) {
-            delete games[gameCode]; // Supprimer la partie si aucun joueur n'est connecté
+            delete games[gameCode];
+        } else {
+            // Mise à jour après déconnexion
+            broadcastPlayerCount(gameCode);
         }
     });
-});
-
-const PORT = process.env.PORT || 3000; // Render utilise la variable d'environnement PORT
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
 });
