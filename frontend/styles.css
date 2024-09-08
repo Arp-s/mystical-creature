@@ -15,7 +15,8 @@ body, html {
     background: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: rgb(22, 22, 22);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 h1 {
