@@ -24,6 +24,7 @@ function connectWebSocket(code) {
         let data;
         try {
             data = JSON.parse(event.data);
+            console.log(data)
         } catch (e) {
             data = event.data;
         }
