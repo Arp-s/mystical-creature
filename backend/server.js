@@ -29,10 +29,17 @@ wss.on('connection', (ws, req) => {
     ws.send(JSON.stringify({ message: 'Player joined', playerNumber: playerNumber }));
 
     if (playerNumber === 3) {
-        // Une fois 3 joueurs connectés, distribuer les indices
-        const randomClueGroup = clues[Math.floor(Math.random() * Object.keys(clues).length)];
+        const clueKeys = Object.keys(clues);
+        const randomKey = clueKeys[Math.floor(Math.random() * clueKeys.length)];
+        const randomClueGroup = clues[randomKey];
+    
         games[gameCode].players.forEach((player, index) => {
-            player.send(JSON.stringify({ clue: randomClueGroup[`indice${index + 1}`] }));
+            const clue = randomClueGroup[`indice${index + 1}`];
+            if (clue) {
+                player.send(JSON.stringify({ clue }));
+            } else {
+                console.error(`Clue indice${index + 1} not found`);
+            }
         });
     }
 
