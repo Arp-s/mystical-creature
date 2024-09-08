@@ -16,7 +16,7 @@ body, html {
     background: white;
     padding: 20px;
     border-radius: 8px;
-    background: rgb(22, 22, 22);
+    background: rgb(25, 25, 25);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -28,10 +28,14 @@ button, input {
     padding: 10px 20px;
     margin: 10px;
     font-size: 16px;
-    background: inherit;
+    background: rgb(50, 50, 50);
+    color: inherit;
+    border: none;
 }
 
 input {
     width: 200px;
-    background: inherit;
+    background: rgb(50, 50, 50);
+    color: inherit;
+    border: none;
 }
