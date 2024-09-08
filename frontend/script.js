@@ -25,6 +25,16 @@ joinBtn?.addEventListener('click', () => {
     }
 });
 
+launchBtn?.addEventListener('click', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+        socket.send(JSON.stringify({ type: 'startGame' }));
+    } else {
+        console.error('No game code provided');
+    }
+});
+
 function connectWebSocket(code) {
     socket = new WebSocket(`wss://mystical-creature.onrender.com/?code=${code}`);
 
@@ -61,16 +71,6 @@ function connectWebSocket(code) {
         console.log('WebSocket connection closed');
     };
 }
-
-launchBtn?.addEventListener('click', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    if (code) {
-        socket.send(JSON.stringify({ type: 'startGame' }));
-    } else {
-        console.error('No game code provided');
-    }
-});
 
 if (window.location.pathname.includes('waiting.html')) {
     const urlParams = new URLSearchParams(window.location.search);
