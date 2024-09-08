@@ -43,11 +43,13 @@ function connectWebSocket(code) {
         } catch (e) {
             data = event.data; // Si le message n'est pas JSON, il reste tel quel
         }
-
-        if (data.message && data.message.startsWith('playerCount:')) {
-            playerCount.textContent = data.message.split(':')[1];
-        } else {
-            clueDisplay.textContent = data.clue || data; // Affiche l'indice reçu
+        
+        if (data.playerCount !== undefined) {
+            playerCount.textContent = data.playerCount;
+        }
+        
+        if (data.clue) {
+            clueDisplay.textContent = data.clue; // Affiche l'indice reçu
         }
     };
 
