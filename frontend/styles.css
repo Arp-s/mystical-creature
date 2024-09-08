@@ -28,8 +28,10 @@ button, input {
     padding: 10px 20px;
     margin: 10px;
     font-size: 16px;
+    background: inherit;
 }
 
 input {
     width: 200px;
+    background: inherit;
 }
