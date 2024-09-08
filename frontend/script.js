@@ -37,10 +37,17 @@ function connectWebSocket(code) {
     };
 
     socket.onmessage = (event) => {
-        if (event.data.startsWith('playerCount:')) {
-            playerCount.textContent = event.data.split(':')[1];
+        let data;
+        try {
+            data = JSON.parse(event.data);
+        } catch (e) {
+            data = event.data; // Si le message n'est pas JSON, il reste tel quel
+        }
+
+        if (data.message && data.message.startsWith('playerCount:')) {
+            playerCount.textContent = data.message.split(':')[1];
         } else {
-            clueDisplay.textContent = event.data; // Affiche l'indice reçu
+            clueDisplay.textContent = data.clue || data; // Affiche l'indice reçu
         }
     };
 
@@ -64,14 +71,20 @@ launchBtn?.addEventListener('click', () => {
 if (window.location.pathname.includes('waiting.html')) {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    connectWebSocket(code);
+    if (code) {
+        connectWebSocket(code);
+    } else {
+        console.error('No game code provided');
+    }
 }
 
 // Révéler un indice sur la page de jeu
 revealBtn?.addEventListener('click', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    if (code && !socket) {
+    if (code) {
         connectWebSocket(code);
+    } else {
+        console.error('No game code provided');
     }
 });
