@@ -1,10 +1,12 @@
-const express = require('express');
+const express = require('express'); // Assure-toi d'avoir importé express
 const http = require('http');
-const WebSocket = require('ws');
+const WebSocket = require('ws'); // Importation correcte du module WebSocket
 const clues = require('./clues.json');
 
 const app = express();
 const server = http.createServer(app);
+
+// Initialise wss avant toute utilisation
 const wss = new WebSocket.Server({ server });
 
 let games = {};
@@ -13,13 +15,29 @@ let games = {};
 function broadcastPlayerCount(gameCode) {
     const playerCount = games[gameCode].players.length;
     games[gameCode].players.forEach(player => {
-        player.send(JSON.stringify({ playerCount }));
+        player.send(JSON.stringify({ playerCount })); // Envoie le nombre de joueurs à chaque client
+    });
+}
+
+// Fonction pour envoyer les indices aux joueurs
+function sendClues(gameCode) {
+    const clueKeys = Object.keys(clues);
+    const randomKey = clueKeys[Math.floor(Math.random() * clueKeys.length)];
+    const randomClueGroup = clues[randomKey];
+
+    games[gameCode].players.forEach((player, index) => {
+        const clue = randomClueGroup[`indice${index + 1}`];
+        if (clue) {
+            player.send(JSON.stringify({ clue }));
+        } else {
+            console.error(`Clue indice${index + 1} not found`);
+        }
     });
 }
 
 // Gestion des connexions WebSocket
 wss.on('connection', (ws, req) => {
-    const params = new URLSearchParams(req.url.slice(1));
+    const params = new URLSearchParams(req.url.slice(1)); // Extraire les paramètres de l'URL
     const gameCode = params.get('code');
 
     if (!gameCode) {
@@ -34,31 +52,37 @@ wss.on('connection', (ws, req) => {
 
     const playerNumber = games[gameCode].players.length + 1;
     games[gameCode].players.push(ws);
-    broadcastPlayerCount(gameCode); // Mise à jour du nombre de joueurs
-    ws.send(JSON.stringify({ message: 'Player joined', playerNumber }));
 
-    // Envoie les indices lorsque 3 joueurs sont connectés
-    if (playerNumber === 3) {
-        const randomClueGroup = clues[Object.keys(clues)[Math.floor(Math.random() * Object.keys(clues).length)]];
-        games[gameCode].players.forEach((player, index) => {
-            const clue = randomClueGroup[`indice${index + 1}`];
-            if (clue) player.send(JSON.stringify({ clue }));
-            else console.error(`Clue indice${index + 1} not found`);
-        });
-    }
+    // Diffuse le nombre de joueurs après qu'un joueur ait rejoint
+    broadcastPlayerCount(gameCode);
+
+    ws.send(JSON.stringify({ message: 'Player joined', playerNumber: playerNumber }));
 
     ws.on('message', (message) => {
-        console.log(`Received message: ${message}`);
+        try {
+            const data = JSON.parse(message);
+
+            // Vérifie si le message est une commande pour commencer le jeu
+            if (data.command === 'start_game' && games[gameCode].players.length === 3) {
+                sendClues(gameCode);
+            }
+        } catch (error) {
+            console.error('Failed to parse message:', error);
+        }
     });
 
     ws.on('close', () => {
         games[gameCode].players = games[gameCode].players.filter(player => player !== ws);
-        if (games[gameCode].players.length === 0) delete games[gameCode];
-        else broadcastPlayerCount(gameCode); // Mise à jour du nombre de joueurs
+        if (games[gameCode].players.length === 0) {
+            delete games[gameCode]; // Supprimer la partie si aucun joueur n'est connecté
+        } else {
+            // Diffuse le nombre de joueurs après qu'un joueur ait quitté
+            broadcastPlayerCount(gameCode);
+        }
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // Render utilise la variable d'environnement PORT
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
