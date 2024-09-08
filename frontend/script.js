@@ -48,7 +48,7 @@ function connectWebSocket(code) {
             playerCount.textContent = data.playerCount;
         }
         
-        if (data.clue) {
+        if (data.clue !== undefined) {
             clueDisplay.textContent = data.clue; // Affiche l'indice reçu
         }
     };
